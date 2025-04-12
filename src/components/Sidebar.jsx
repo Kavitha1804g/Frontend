@@ -5,7 +5,7 @@ function Sidebar() {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', icon: FiHome, label: 'Dashboard' },
+    { path: '/dashboard', icon: FiHome, label: 'Dashboard' },
     { path: '/projects', icon: FiFolder, label: 'Projects' },
     { path: '/tasks', icon: FiCheckSquare, label: 'Tasks' },
     { path: '/settings', icon: FiSettings, label: 'Settings' }
@@ -52,6 +52,13 @@ function Sidebar() {
             <Link
             key={item.path}
             to={item.path}
+            //added now
+            // onClick={() => {
+            //   if (location.pathname === item.path) {
+            //     window.location.reload(); // ✅ Force refresh if already on the same page
+            //   }
+            // }}
+
             className={`group flex items-center px-7 py-4 text-gray-100 font-semibold rounded-lg transition-all duration-300 relative overflow-hidden ${
               isActive
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md border-l-4 border-purple-400 scale-105'

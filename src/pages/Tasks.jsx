@@ -166,12 +166,7 @@ function Tasks() {
   const [editingTask, setEditingTask] = useState(null);
 
   // Fetch Tasks from Backend
-  // useEffect(() => {
-  //   axios
-  //     .get(API_URL)
-  //     .then((res) => setTasks(res.data))
-  //     .catch((err) => console.error("Error fetching tasks:", err));
-  // }, []);
+ 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -190,20 +185,30 @@ function Tasks() {
     e.preventDefault();
 
     try {
-      if (editingTask) {
-        await axios.put(`${API_URL}/${editingTask.id}`, newTask);
-      } else {
-        const res = await axios.post(API_URL, newTask);
-        setTasks([...tasks, res.data]);
-      }
+        if (editingTask) {
+            // 🛠 Update existing task
+            const res = await axios.put(`${API_URL}/${editingTask.id}`, newTask);
 
-      setShowNewTask(false);
-      setEditingTask(null);
-      setNewTask({ title: "", project: "", assignee: "", dueDate: "", priority: "Medium", status: "Not Started" });
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.id === editingTask.id ? { ...task, ...newTask } : task
+                )
+            );
+        } else {
+            // ➕ Create new task
+            const res = await axios.post(API_URL, newTask);
+            setTasks([...tasks, res.data]);
+        }
+
+        setShowNewTask(false);
+        setEditingTask(null);
+        setNewTask({ title: "", project: "", assignee: "", dueDate: "", priority: "Medium", status: "Not Started" });
+
     } catch (error) {
-      console.error("Error saving task:", error);
+        console.error("Error saving task:", error);
     }
-  };
+};
+
 
   // Delete Task
   const handleDelete = async (id) => {

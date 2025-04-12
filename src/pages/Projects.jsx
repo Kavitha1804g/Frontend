@@ -680,7 +680,6 @@
 
 // export default Projects;
 
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
@@ -711,26 +710,35 @@ function Projects() {
     fetchProjects();
   }, []);
 
-  // ✅ Handle Add / Update
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editProject) {
-        await axios.put(`${API_URL}/${editProject.id}`, { ...newProject, team: newProject.team.split(",") });
-        setProjects((prevProjects) =>
-          prevProjects.map((p) => (p.id === editProject.id ? { ...editProject, ...newProject } : p))
-        );
-      } else {
-        const res = await axios.post(API_URL, { ...newProject, team: newProject.team.split(",") });
-        setProjects((prevProjects) => [...prevProjects, res.data]);
-      }
-      setShowNewProject(false);
-      setEditProject(null);
-      setNewProject({ name: "", description: "", team: "", status: "Not Started" });
+        const updatedProject = { 
+            ...newProject, 
+            team: typeof newProject.team === "string" ? newProject.team.split(",").map(t => t.trim()) : newProject.team
+        };
+
+        if (editProject) {
+            await axios.put(`${API_URL}/${editProject.id}`, updatedProject);
+            setProjects((prevProjects) =>
+                prevProjects.map((p) => (p.id === editProject.id ? { ...p, ...updatedProject } : p))
+            );
+        } else {
+            const res = await axios.post(API_URL, updatedProject);
+            setProjects((prevProjects) => [...prevProjects, res.data]);
+        }
+
+        // Reset form and close modal
+        setEditProject(null);
+        setNewProject({ name: "", description: "", team: "", status: "Not Started" });
+        setShowNewProject(false);
+
     } catch (error) {
-      console.error("Error saving project:", error);
+        console.error("Error saving project:", error);
     }
-  };
+};
+
 
   // ✅ Handle Delete
   const handleDelete = async (id) => {
@@ -744,12 +752,16 @@ function Projects() {
     }
   };
 
-  // ✅ Handle Edit
+  
+
   const handleEdit = (project) => {
     setEditProject(project);
-    setNewProject({ ...project, team: project.team.join(", ") });
+    setNewProject({ 
+        ...project, 
+        team: Array.isArray(project.team) ? project.team.join(", ") : project.team 
+    });
     setShowNewProject(true);
-  };
+};
 
   return (
     <div className="space-y-6">

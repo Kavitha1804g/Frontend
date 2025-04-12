@@ -12,13 +12,33 @@ function SignUp() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Mock signup - in real app would create account in backend
-    login(formData);
-    navigate('/');
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Mock signup - in real app would create account in backend
+  //   login(formData);
+  //   navigate('/');
+  // };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5001/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+  
+      alert("Signup successful! You can now log in.");
+      navigate("/login");
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert(error.message);
+    }
+  };
+  
   const handleChange = (e) => {
     setFormData({
       ...formData,
